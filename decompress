@@ -1,0 +1,33 @@
+#! /bin/bash
+
+open_sem(){
+    mkfifo pipe-$$
+    exec 3<>pipe-$$
+    rm pipe-$$
+    local i=$1
+    for((;i>0;i--)); do
+        printf %s 000 >&3
+    done
+}
+run_with_lock(){
+    local x
+    read -u 3 -n 3 x && ((0==x)) || exit $x
+    (
+    "$@" 
+    printf '%.3d' $? >&3
+    )&
+}
+
+decompress_file(){
+    echo Started $1
+    local newFileName=${1#*/*/}
+    bzcat $1 > Decompressed/${newFileName%.*}
+    echo Finished $1
+}
+
+N=4
+open_sem $N
+
+while read -r file <&9; do
+    run_with_lock decompress_file $file
+done 9< <(find ./Downloaded/R* -type f;)

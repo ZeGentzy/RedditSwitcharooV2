@@ -1,0 +1,38 @@
+#! /bin/bash
+
+open_sem(){
+    mkfifo pipe-$$
+    exec 3<>pipe-$$
+    rm pipe-$$
+    local i=$1
+    for((;i>0;i--)); do
+        printf %s 000 >&3
+    done
+}
+run_with_lock(){
+    local x
+    read -u 3 -n 3 x && ((0==x)) || exit $x
+    (
+    "$@" 
+    printf '%.3d' $? >&3
+    )&
+}
+
+upload_file(){
+    echo Started $1
+    rm /tmp/data-$1
+    cp FormatedConv/$1 /tmp/data-$1
+    chmod a+rw /tmp/data-$1
+
+    echo "LOAD DATA LOCAL INFILE '/tmp/data-$1' INTO TABLE RedditComments FIELDS TERMINATED BY ',' ENCLOSED BY '\"' IGNORE 1 LINES ($(cat /tmp/data-$1 | head -n 1));" | mysql -u auto -pauto RedditData
+    echo Completed $1
+    rm /tmp/data-$1
+    echo Removed $1
+}
+
+N=4
+open_sem $N
+
+while read -r file <&9; do
+   run_with_lock upload_file $file
+done 9< <(find ./FormatedConv/* -exec basename {} \;)
