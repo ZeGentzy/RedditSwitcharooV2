@@ -6,11 +6,11 @@ What I've been workin' on for the last ~2 months
  * python
  * /bin/bash
  * A mysql server running on "localhost"
-   * With the user "auto" (perferably requiring no pasword)
+   * With the user "auto" (preferably requiring no password)
    * A database called "RedditData"
      * which contains a table called "RedditComments"
-       * Must have correct columms
- * Other bash utilites like "cat", "basename", "find", ect...
+       * Must have correct columns
+ * Other bash utilities like "cat", "basename", "find", ect...
 
  ## Files and Directories:
  - [D]Downloaded: Directory for newly downloaded reddit comment files
@@ -20,5 +20,5 @@ What I've been workin' on for the last ~2 months
  - [F]convert.py: Python script which converts JSON files in Decompressed into csv files stored in FormatedConv
  - [F]decompress: Bash script which decompresses reddit comment files in Downloaded into Decompressed
  - [D]FormatedConv: Where csv files are stored
- - [F]convert: Bash script which calles multiple instances of convert.py in parrellel
+ - [F]convert: Bash script which calls multiple instances of convert.py in parallel
  - [F]upload: Bash script which inserts csv files into database
